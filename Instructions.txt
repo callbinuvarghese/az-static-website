@@ -1,0 +1,125 @@
+
+export RESOURCE_GROUP="AzureStaticWebsite-rg"
+export REGION=eastus2
+export STORAGE_ACCT_NAME="strgacctstaticwebsite1"
+export WEBSITE_INDEX="index.html"
+export WEBSITE_404="404.html"
+export SOURCE_PATH="."
+az account set --subscription "59xx-xxx-xx--xxx-xxc20"
+
+1. Create a new RESOURCE_GROUP for web hosting
+az group create --name $RESOURCE_GROUP --location $REGION
+
+2. Create a new Storage account for web hosting
+az storage account create --name $STORAGE_ACCT_NAME --location $REGION --resource-group $RESOURCE_GROUP --sku Standard_LRS
+
+3. Enable static website hosting for the storage account
+az storage blob service-properties update --account-name $STORAGE_ACCT_NAME --static-website --404-document $WEBSITE_404 --index-document $WEBSITE_INDEX
+
+4. Upload Site contents to $web container in the Storage account
+az storage blob upload-batch -s $SOURCE_PATH -d '$web' --account-name $STORAGE_ACCT_NAME
+
+5. Find website URL
+az storage account show -n $STORAGE_ACCT_NAME -g $RESOURCE_GROUP --query "primaryEndpoints.web" --output tsv
+
+6. Use the URL in browser to see the web page
+
+===
+➜  static-web az storage blob service-properties update --account-name $STORAGE_ACCT_NAME --static-website --404-document $WEBSITE_404 --index-document $WEBSITE_INDEX
+
+
+There are no credentials provided in your command and environment, we will query for account key for your storage account.
+It is recommended to provide --connection-string, --account-key or --sas-token in your command as credentials.
+
+You also can add `--auth-mode login` in your command to use Azure Active Directory (Azure AD) for authorization if your login account is assigned required RBAC roles.
+For more information about RBAC roles in storage, visit https://docs.microsoft.com/azure/storage/common/storage-auth-aad-rbac-cli.
+
+In addition, setting the corresponding environment variables can avoid inputting credentials in your command. Please use --help to get more information about environment variable usage.
+{
+  "cors": [],
+  "deleteRetentionPolicy": {
+    "allowPermanentDelete": null,
+    "days": null,
+    "enabled": false
+  },
+  "hourMetrics": {
+    "enabled": true,
+    "includeApis": true,
+    "retentionPolicy": {
+      "allowPermanentDelete": null,
+      "days": 7,
+      "enabled": true
+    },
+    "version": "1.0"
+  },
+  "logging": {
+    "delete": false,
+    "read": false,
+    "retentionPolicy": {
+      "allowPermanentDelete": null,
+      "days": null,
+      "enabled": false
+    },
+    "version": "1.0",
+    "write": false
+  },
+  "minuteMetrics": {
+    "enabled": false,
+    "includeApis": null,
+    "retentionPolicy": {
+      "allowPermanentDelete": null,
+      "days": null,
+      "enabled": false
+    },
+    "version": "1.0"
+  },
+  "staticWebsite": {
+    "defaultIndexDocumentPath": null,
+    "enabled": true,
+    "errorDocument_404Path": "404.html",
+    "indexDocument": "index.html"
+  },
+  "target_version": null
+}
+➜  static-web
+
+➜  static-web az storage blob upload-batch -s $SOURCE_PATH -d '$web' --account-name $STORAGE_ACCT_NAME
+
+
+There are no credentials provided in your command and environment, we will query for account key for your storage account.
+It is recommended to provide --connection-string, --account-key or --sas-token in your command as credentials.
+
+You also can add `--auth-mode login` in your command to use Azure Active Directory (Azure AD) for authorization if your login account is assigned required RBAC roles.
+For more information about RBAC roles in storage, visit https://docs.microsoft.com/azure/storage/common/storage-auth-aad-rbac-cli.
+
+In addition, setting the corresponding environment variables can avoid inputting credentials in your command. Please use --help to get more information about environment variable usage.
+1/3: "index.html"[####################################################]  100.0003/3: "Instructions.txt"[##############################################]  100.000Finished[#############################################################]  100.0000%
+[
+  {
+    "Blob": "https://strgacctstaticwebsite1.blob.core.windows.net/%24web/index.html",
+    "Last Modified": "2024-06-05T03:02:24+00:00",
+    "Type": "text/html",
+    "eTag": "\"0x8DC850BECC9321E\""
+  },
+  {
+    "Blob": "https://strgacctstaticwebsite1.blob.core.windows.net/%24web/404.html",
+    "Last Modified": "2024-06-05T03:02:24+00:00",
+    "Type": "text/html",
+    "eTag": "\"0x8DC850BECD712B2\""
+  },
+  {
+    "Blob": "https://strgacctstaticwebsite1.blob.core.windows.net/%24web/Instructions.txt",
+    "Last Modified": "2024-06-05T03:02:24+00:00",
+    "Type": "text/plain",
+    "eTag": "\"0x8DC850BECE9D481\""
+  }
+]
+
+➜  static-web az storage account show -n $STORAGE_ACCT_NAME -g $RESOURCE_GROUP --query "primaryEndpoints.web" --output tsv
+
+https://strgacctstaticwebsite1.z20.web.core.windows.net/
+
+Put the above URL in on browser to see the web page 
+
+git init -b main
+git add .
